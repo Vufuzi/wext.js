@@ -2,12 +2,16 @@
 import http from 'http';
 import polka from 'polka';
 import fs from 'fs';
+import path from 'path';
 import serveStatic from 'serve-static';
 import compression from 'compression';
 import htmlMinifier from 'html-minifier';
 // import htmlEntities from 'html-entities';
 
-const wextClient = fs.readFileSync('browser/wext-client.js').toString();
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+const wextClientPath = path.join(__dirname, '../browser/wext-client.js');
+console.log(wextClientPath);
+const wextClient = fs.readFileSync(wextClientPath).toString();
 
 /**
  * Minifies HTML.
