@@ -1,9 +1,13 @@
+// eslint-disable-next-line
 import http from 'http';
 import polka from 'polka';
+import fs from 'fs';
 import serveStatic from 'serve-static';
 import compression from 'compression';
 import htmlMinifier from 'html-minifier';
-import htmlEntities from 'html-entities';
+// import htmlEntities from 'html-entities';
+
+const wextClient = fs.readFileSync('browser/wext-client.js').toString();
 
 /**
  * Minifies HTML.
@@ -29,7 +33,7 @@ const minifyHTML = s => htmlMinifier.minify(s, {
  * @param template
  * @param answerWithPartialContent
  */
-function generatePreContent(template, answerWithPartialContent) {
+function generatePreContent (template, answerWithPartialContent) {
   if (!answerWithPartialContent) {
     return template.split('{{body}}')[0];
   }
@@ -47,7 +51,7 @@ function generatePreContent(template, answerWithPartialContent) {
  * @param template
  * @param answerWithPartialContent
  */
-function generatePostContent(template, answerWithPartialContent) {
+function generatePostContent (template, answerWithPartialContent) {
   if (!answerWithPartialContent) {
     return template.split('{{body}}')[1];
   }
@@ -76,16 +80,16 @@ function wext (options) {
     if (!preContent && head) {
       res.setHeader(
         'X-Header-Updates',
-        config.server.minifyHTML
-          ? encodeURIComponent(minifyHTML(head))
-          : encodeURIComponent(head)
+        config.server.minifyHTML ?
+          encodeURIComponent(minifyHTML(head)) :
+          encodeURIComponent(head)
       );
     }
 
     res.writeHead(200);
 
     if (preContent) {
-      const preSplit = preContent.split(/\<head\>/);
+      const preSplit = preContent.split(/<head>/);
       const pre = head ? `
         ${preSplit[0]}
         <head>
@@ -198,6 +202,10 @@ export default class Wext {
       polkaInstace.use(serveStatic('public'));
     }
 
+    polkaInstace.use('/wext-client.js', res => {
+      res.end(wextClient);
+    });
+
     if (this.config.router.pages.length > 0) {
       this.config.router.pages.forEach(page => {
         polkaInstace.get(page.route, wext({
@@ -209,6 +217,6 @@ export default class Wext {
 
     polkaInstace.listen(port);
 
-    console.log(`Wext server running at http://localhost:5000`);
+    console.log('Wext server running at http://localhost:5000');
   }
 }
