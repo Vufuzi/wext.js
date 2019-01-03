@@ -1,13 +1,15 @@
-export default class Router {
-  constructor(routerElement) {
+export default class WextRouter {
+  constructor (routerElement) {
     if (routerElement instanceof HTMLElement) {
       this.routerElement = routerElement;
     }
 
-    document.addEventListener('router:navigate', event => {
-      const { pathname } = event.detail;
+    document.addEventListener('wext-router:navigate', event => {
+      if (event instanceof CustomEvent) {
+        const { pathname } = event.detail;
 
-      this.navigate(pathname);
+        this.navigate(pathname);
+      }
     });
 
     window.addEventListener('popstate', event => {
@@ -16,12 +18,12 @@ export default class Router {
       this.navigate(pathname);
     });
 
-    if (this.routerElement.innerHTML === "") {
+    if (this.routerElement.innerHTML === '') {
       this.navigate(document.location.pathname);
     }
   }
 
-  async navigate(pathname) {
+  async navigate (pathname) {
     pathname = pathname.substr(0, 1) === '/' ? pathname : `/${pathname}`;
     const headers = new Headers();
 
@@ -33,7 +35,7 @@ export default class Router {
     const headerUpdates = response.headers.get('X-Header-Updates');
 
     if (headerUpdates) {
-      const title = decodeURIComponent(headerUpdates).match(/\<title\>(.+)\<\/title\>/i)[1]
+      const title = decodeURIComponent(headerUpdates).match(/<title>(.+)<\/title>/i)[1];
 
       if (title) {
         document.title = title;
@@ -51,15 +53,15 @@ export default class Router {
 }
 
 class WextLink extends HTMLElement {
-  navigate(pathname) {
-    document.dispatchEvent(new CustomEvent('router:navigate', {
+  navigate (pathname) {
+    document.dispatchEvent(new CustomEvent('wext-router:navigate', {
       detail: {
         pathname
       }
     }));
   }
 
-  connectedCallback() {
+  connectedCallback () {
     const a = document.createElement('a');
     const href = this.getAttribute('href');
 
@@ -67,7 +69,7 @@ class WextLink extends HTMLElement {
     a.innerHTML = `
       <style>
       :host {cursor:pointer}
-      a {all:unset}
+      a {all:unset;display:content}
       </style>
       <slot></slot>
     `;
