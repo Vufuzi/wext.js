@@ -29,7 +29,7 @@ export default class WextRouter {
 
     headers.append('X-Partial-Content', 'true');
 
-    const response = await fetch(document.location.origin + pathname, { headers });
+    const response = await fetch(document.location.origin + pathname + '?partialContent=true', { headers });
     const text = await response.text();
 
     const headerUpdates = response.headers.get('X-Header-Updates');
@@ -77,6 +77,16 @@ class WextLink extends HTMLElement {
     this.addEventListener('click', event => {
       event.preventDefault();
       this.navigate(href);
+    });
+
+    this.addEventListener('mouseover', () => {
+      const link = document.createElement('link');
+
+      link.setAttribute('rel', 'preload');
+      link.setAttribute('href', this.getAttribute('href') + '?partialContent=true');
+      link.setAttribute('as', 'fetch');
+
+      document.head.appendChild(link);
     });
 
     const sDOM = this.attachShadow({ mode: 'closed' });

@@ -89,7 +89,7 @@ function wext (options) {
    * @returns {Promise<http.ServerResponse>} - ServerResponse.
    */
   async function wextProxy (req, res) {
-    const partialContent = Boolean(req.headers['x-partial-content']);
+    const partialContent = Boolean(req.headers['x-partial-content'] || req.query.partialContent);
     const preContent = generatePreContent(page.template, partialContent);
 
     const { body, head } = await page.handler(req, res);
