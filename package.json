@@ -1,0 +1,31 @@
+{
+  "name": "wext",
+  "version": "0.0.1",
+  "description": "Universal web applications",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Vufuzi/wext.js.git"
+  },
+  "keywords": [
+    "server side rendering",
+    "nextjs",
+    "nuxtjs",
+    "ssr",
+    "browser",
+    "components",
+    "web-components"
+  ],
+  "author": "Jeremy Karlsson <jeremy@vufuzi.se>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vufuzi/wext.js/issues"
+  },
+  "homepage": "https://github.com/Vufuzi/wext.js#readme",
+  "dependencies": {
+    "polka": "^0.5.1"
+  }
+}
