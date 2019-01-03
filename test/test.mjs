@@ -1,4 +1,4 @@
-import Wext from './index.mjs';
+import Wext from '../node/index.mjs';
 
 const template = `
   <!DOCTYPE html>
