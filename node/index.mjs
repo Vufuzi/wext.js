@@ -202,7 +202,10 @@ export default class Wext {
       polkaInstace.use(serveStatic('public'));
     }
 
-    polkaInstace.use(serveStatic('./browser'));
+    polkaInstace.use('/wext-client.js', (req, res) => {
+      res.setHeader('Content-type', 'application/javascript');
+      res.end(wextClient);
+    });
 
     if (this.config.router.pages.length > 0) {
       this.config.router.pages.forEach(page => {
