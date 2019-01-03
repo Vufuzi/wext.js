@@ -8,15 +8,17 @@ import compression from 'compression';
 import htmlMinifier from 'html-minifier';
 // import htmlEntities from 'html-entities';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname)
+// @ts-ignore
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const wextClientPath = path.join(__dirname, '../browser/wext-client.js');
-console.log(wextClientPath);
+
 const wextClient = fs.readFileSync(wextClientPath).toString();
 
 /**
  * Minifies HTML.
  *
- * @param {string} s
+ * @param {string} s - HTML to minify.
+ * @returns {string} - Minified HTML.
  */
 const minifyHTML = s => htmlMinifier.minify(s, {
   collapseWhitespace: true,
@@ -34,8 +36,9 @@ const minifyHTML = s => htmlMinifier.minify(s, {
  * If answerWithPartialContent if true, then anything
  * before {{body}} will not be sent in the request.
  *
- * @param template
- * @param answerWithPartialContent
+ * @param {string} template - The template to use.
+ * @param {boolean} answerWithPartialContent - Wether or not to send partial content.
+ * @returns {string|null} - Pre content.
  */
 function generatePreContent (template, answerWithPartialContent) {
   if (!answerWithPartialContent) {
@@ -52,8 +55,9 @@ function generatePreContent (template, answerWithPartialContent) {
  * If answerWithPartialContent if true, then anything
  * after {{body}} will not be sent in the request.
  *
- * @param template
- * @param answerWithPartialContent
+ * @param {string} template - The template to use, must contain {{body}}.
+ * @param {boolean} answerWithPartialContent - Wether or not to send partial content.
+ * @returns {string|null} - Pre content.
  */
 function generatePostContent (template, answerWithPartialContent) {
   if (!answerWithPartialContent) {
@@ -64,16 +68,25 @@ function generatePostContent (template, answerWithPartialContent) {
 }
 
 /**
+ * @callback WextCallback
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse} res
+ * @returns {Promise<http.ServerResponse>}
+ */
+
+/**
  * Wrapper to handle sending only partial content or not.
  *
- * @param {{ config: WextConfig, page: Page }} options
+ * @param {{ config: WextConfig, page: Page }} options - Wext config and data on the page.
+ * @returns {WextCallback} - WextCallback.
  */
 function wext (options) {
   const { config, page } = options;
 
   /**
-   * @param {http.IncomingMessage} req
-   * @param {http.ServerResponse} res
+   * @param {http.IncomingMessage} req - IncomingMessage.
+   * @param {http.ServerResponse} res - ServerResponse.
+   * @returns {Promise<http.ServerResponse>} - ServerResponse.
    */
   async function wextProxy (req, res) {
     const partialContent = Boolean(req.headers['x-partial-content']);
@@ -160,7 +173,7 @@ function wext (options) {
 
 export default class Wext {
   /**
-   * @param {WextConfig} config
+   * @param {WextConfig} config - Wext config.
    */
   constructor (config) {
     this.config = {
@@ -188,7 +201,7 @@ export default class Wext {
    * Start the wext server on port 5000, or
    * another port if parameter is passed.
    *
-   * @param {number} port
+   * @param {number} port - Port to run on.
    */
   startServer (port = 5000) {
     if (process.env.DEBUG) {
@@ -222,6 +235,7 @@ export default class Wext {
 
     polkaInstace.listen(port);
 
-    console.log('Wext server running at http://localhost:5000');
+    // eslint-disable-next-line no-console
+    console.log(`Wext server running at http://localhost:${port}`);
   }
 }
