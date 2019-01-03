@@ -4,7 +4,7 @@
   "description": "Universal web applications",
   "main": "index.mjs",
   "scripts": {
-    "test": "npm test"
+    "dev": "DEBUG=true node --experimental-modules test.mjs"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,10 @@
   },
   "homepage": "https://github.com/Vufuzi/wext.js#readme",
   "dependencies": {
-    "polka": "^0.5.1"
+    "compression": "^1.7.3",
+    "html-entities": "^1.2.1",
+    "html-minifier": "^3.5.21",
+    "polka": "^0.5.1",
+    "serve-static": "^1.13.2"
   }
 }
