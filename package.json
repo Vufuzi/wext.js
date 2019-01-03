@@ -2,7 +2,7 @@
   "name": "wext",
   "version": "0.0.1",
   "description": "Universal web applications",
-  "main": "index.mjs",
+  "main": "node/index.mjs",
   "scripts": {
     "dev": "DEBUG=true node --experimental-modules test/test.mjs"
   },
