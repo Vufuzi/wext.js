@@ -24,6 +24,10 @@ export default class WextRouter {
   }
 
   async navigate (pathname) {
+    document.dispatchEvent(new CustomEvent('wext-router:loading', {
+      detail: true
+    }));
+
     pathname = pathname.substr(0, 1) === '/' ? pathname : `/${pathname}`;
     const headers = new Headers();
 
@@ -44,6 +48,10 @@ export default class WextRouter {
 
     requestAnimationFrame(() => {
       this.routerElement.innerHTML = text;
+
+      document.dispatchEvent(new CustomEvent('wext-router:loading', {
+        detail: false
+      }));
     });
 
     if (document.location.pathname !== pathname) {
