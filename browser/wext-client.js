@@ -18,6 +18,10 @@ export default class WextRouter {
       this.navigate(pathname);
     });
 
+    /*
+      Wext client was cached by service worker, trigger a fetch of the
+      current page from server to replace the {{body}} injection point.
+    */
     if (this.routerElement.innerHTML === '{{body}}') {
       this.navigate(document.location.pathname);
     }
