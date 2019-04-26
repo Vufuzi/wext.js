@@ -18,7 +18,7 @@ export default class WextRouter {
       this.navigate(pathname);
     });
 
-    if (this.routerElement.innerHTML === '') {
+    if (this.routerElement.innerHTML === '{{body}}') {
       this.navigate(document.location.pathname);
     }
   }
