@@ -1,4 +1,5 @@
 import Wext from '../node/index.mjs';
+import path from 'path';
 
 const template = `
   <!DOCTYPE html>
@@ -20,6 +21,11 @@ const template = `
 `;
 
 const wextConfig = {
+  server: {
+    compression: true,
+    serveStatic: 'test/static', // test/ because npm run dev is run from root and not test dir.
+    minifyHTML: true
+  },
   router: {
     pages: [
       {
@@ -29,6 +35,11 @@ const wextConfig = {
           body: `
             <h1>Wext.js</h1>
             <h2>Home</h2>
+
+            <figure>
+              <img src="blomster.webp" alt="Pinl tulips from the Botanical Garden in Oslo">
+              <figcaption>A picture of flowers from the Botanical Garden in Oslo</figcaption>
+            </figure>
 
             <p>
               Click link to go further!
