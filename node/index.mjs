@@ -136,7 +136,7 @@ function wext (options) {
 /**
  * @typedef ServerConfig
  * @prop {boolean} compression
- * @prop {boolean} serveStatic
+ * @prop {?string} serveStatic
  * @prop {boolean} minifyHTML
  */
 
@@ -216,7 +216,7 @@ export default class Wext {
     }
 
     if (this.config.server.serveStatic) {
-      polkaInstace.use(serveStatic('public'));
+      polkaInstace.use(serveStatic(this.config.server.serveStatic));
     }
 
     polkaInstace.use('/wext-client.js', (req, res) => {
