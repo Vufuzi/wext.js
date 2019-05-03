@@ -56,6 +56,10 @@ export default class WextRouter {
       document.dispatchEvent(new CustomEvent('wext-router:loading', {
         detail: false
       }));
+
+      requestAnimationFrame(() => {
+        this.routerElement.scrollTop = 0;
+      });
     });
 
     if (document.location.pathname !== pathname) {
