@@ -114,6 +114,7 @@ function wext (options) {
       console.log(head);
     }
 
+    /*
     if (!preContent && head) {
       if (DEBUG_ENABLED) {
         console.log('No precontent is going to be delivered, but a update for head is available. Sending that update in X-Header-Updates.');
@@ -126,6 +127,7 @@ function wext (options) {
           encodeURIComponent(head)
       );
     }
+    */
 
     res.writeHead(200);
 
