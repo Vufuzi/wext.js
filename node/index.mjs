@@ -101,7 +101,7 @@ function wext (options) {
     if (!preContent && head) {
       const title = head.match(/<title>(.+)<\/title>/i)[1];
       const json = JSON.stringify({ title });
-      const base64JSON = Buffer.from(json).toString('base64');
+      const base64JSON = Buffer.from(json, 'ascii').toString('base64');
 
       res.setHeader('X-Header-Updates', base64JSON);
     }
