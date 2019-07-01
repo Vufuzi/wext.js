@@ -1,3 +1,11 @@
+function base64DecodeUnicode (str) {
+  // https://stackoverflow.com/questions/30106476/using-javascripts-atob-to-decode-base64-doesnt-properly-decode-utf-8-strings
+  // Going backwards: from bytestream, to percent-encoding, to original string.
+  return decodeURIComponent(atob(str).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+
 export default class WextRouter {
   constructor (routerElement) {
     if (routerElement instanceof HTMLElement) {
@@ -43,7 +51,7 @@ export default class WextRouter {
     const headerUpdates = response.headers.get('X-Header-Updates');
 
     if (headerUpdates) {
-      const { title } = JSON.parse(atob(headerUpdates));
+      const { title } = JSON.parse(base64DecodeUnicode(headerUpdates));
 
       if (title) {
         document.title = title;

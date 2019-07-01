@@ -58,7 +58,7 @@ const wextConfig = {
 
             <p>About me, heh? I'm rather cool I guess...</p>
           `,
-          head: '<title>Åäö</title>'
+          head: '<title>Hej - Åäö</title>'
         })
       }
     ]
