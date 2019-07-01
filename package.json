@@ -1,6 +1,6 @@
 {
   "name": "wext",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Universal web applications",
   "main": "node/index.mjs",
   "scripts": {
