@@ -43,7 +43,7 @@ export default class WextRouter {
     const headerUpdates = response.headers.get('X-Header-Updates');
 
     if (headerUpdates) {
-      const title = decodeURIComponent(headerUpdates).match(/<title>(.+)<\/title>/i)[1];
+      const { title } = JSON.parse(headerUpdates);
 
       if (title) {
         document.title = title;

@@ -89,53 +89,24 @@ function wext (options) {
    * @returns {Promise<http.ServerResponse>} - ServerResponse.
    */
   async function wextProxy (req, res) {
-    const DEBUG_ENABLED = config.server.debug === true;
-
     // @ts-ignore
     const partialContent = Boolean(req.headers['x-partial-content'] || req.query.partialContent);
     const preContent = generatePreContent(page.template, partialContent);
-
-    if (DEBUG_ENABLED) {
-      console.log('A page was requested with partialContent set to', partialContent);
-    }
-
-    if (DEBUG_ENABLED) {
-      console.log('Precontent is available?');
-      console.log(Boolean(preContent));
-    }
-
     const { body, head } = await page.handler(req, res);
 
-    if (DEBUG_ENABLED) {
-      console.log('body is evaluated to be:');
-      console.log(body);
-
-      console.log('head is evaluated to be:');
-      console.log(head);
-    }
-
     /*
-    if (!preContent && head) {
-      if (DEBUG_ENABLED) {
-        console.log('No precontent is going to be delivered, but a update for head is available. Sending that update in X-Header-Updates.');
-      }
-
-      res.setHeader(
-        'X-Header-Updates',
-        config.server.minifyHTML ?
-          encodeURIComponent(minifyHTML(head)) :
-          encodeURIComponent(head)
-      );
-    }
+      If we don't send preConent we still want to update the title in the header on client side navigations.
+      Send new title in X-Header-Updates.
     */
+    if (!preContent && head) {
+      const title = head.match(/<title>(.+)<\/title>/i)[1];
+
+      res.setHeader('X-Header-Updates', JSON.stringify({ title }));
+    }
 
     res.writeHead(200);
 
     if (preContent) {
-      if (DEBUG_ENABLED) {
-        console.log('Precontent is available. Writing it.');
-      }
-
       const preSplit = preContent.split(/<head>/);
       const pre = head ? `
         ${preSplit[0]}
@@ -144,41 +115,17 @@ function wext (options) {
         ${preSplit[1]}
       ` : preContent;
 
-      if (DEBUG_ENABLED) {
-        console.log('Precontent is:');
-        console.log(pre);
-      }
-
       res.write(pre);
     }
 
     const mainBody = config.server.minifyHTML ? minifyHTML(body) : body;
 
-    if (DEBUG_ENABLED) {
-      console.log('Writing main body content:');
-      console.log(mainBody);
-    }
-
     res.write(mainBody);
 
     const postContent = generatePostContent(page.template, partialContent);
 
-    if (DEBUG_ENABLED) {
-      console.log('Postcontent is available?');
-      console.log(Boolean(postContent));
-    }
-
     if (postContent) {
-      if (DEBUG_ENABLED) {
-        console.log('Postcontent is:');
-        console.log(postContent);
-      }
-
       res.write(postContent);
-    }
-
-    if (DEBUG_ENABLED) {
-      console.log('Nothing more to write. Ending.');
     }
 
     res.end();
@@ -194,7 +141,6 @@ function wext (options) {
  * @prop {boolean} compression
  * @prop {?string} serveStatic
  * @prop {boolean} minifyHTML
- * @prop {boolean} debug
  */
 
 /**
