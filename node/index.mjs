@@ -90,6 +90,8 @@ function wext (options) {
     const preContent = generatePreContent(page.template, partialContent);
     const { body, head } = await page.handler(req, res);
 
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+
     /*
       If we don't send preConent we still want to update the title in the header on client side navigations.
       Send new title in X-Header-Updates.
@@ -125,8 +127,6 @@ function wext (options) {
     if (postContent) {
       res.write(postContent);
     }
-
-    res.setHeader('Cache-Control', 'public, max-age=3600');
 
     res.end();
 
