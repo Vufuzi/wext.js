@@ -85,12 +85,46 @@ class WextRouter extends HTMLElement {
 window.customElements.define('wext-router', WextRouter);
 
 class WextLink extends HTMLElement {
+  constructor () {
+    super();
+
+    this.preloadTimeout = undefined;
+  }
+
   navigate (pathname) {
     document.dispatchEvent(new CustomEvent('wext-router:navigate', {
       detail: {
         pathname
       }
     }));
+  }
+
+  preloadLink () {
+    const linkToPreload = this.getAttribute('href') + '?partialContent=true';
+    const currentLinkElement = document.querySelector(`link[href="${linkToPreload}"]`);
+
+    if (!currentLinkElement) {
+      const link = document.createElement('link');
+
+      link.setAttribute('rel', 'preload');
+      link.setAttribute('href', linkToPreload);
+      link.setAttribute('as', 'fetch');
+
+      document.head.appendChild(link);
+    }
+  }
+
+  handleMouseOver () {
+    this.preloadTimeout = setTimeout(() => {
+      this.preloadLink();
+      this.preloadTimeout = undefined;
+    }, 65);
+  }
+
+  handleMouseOut () {
+    if (this.preloadTimeout) {
+      clearTimeout(this.preloadTimeout);
+    }
   }
 
   connectedCallback () {
@@ -111,15 +145,8 @@ class WextLink extends HTMLElement {
       this.navigate(href);
     });
 
-    this.addEventListener('mouseover', () => {
-      const link = document.createElement('link');
-
-      link.setAttribute('rel', 'preload');
-      link.setAttribute('href', this.getAttribute('href') + '?partialContent=true');
-      link.setAttribute('as', 'fetch');
-
-      document.head.appendChild(link);
-    });
+    this.addEventListener('mouseover', () => this.handleMouseOver(), false);
+    this.addEventListener('mouseout', () => this.handleMouseOut(), false);
 
     const sDOM = this.attachShadow({ mode: 'closed' });
 
