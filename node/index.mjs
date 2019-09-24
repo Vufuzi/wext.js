@@ -126,6 +126,8 @@ function wext (options) {
       res.write(postContent);
     }
 
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+
     res.end();
 
     return res;

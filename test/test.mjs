@@ -9,9 +9,7 @@ const template = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-  <b>derp</b>
     <wext-router></wext-router>
-    <b>hepr</b>
     <script type="module" src="wext-client.js"></script>
   </body>
   </html>
