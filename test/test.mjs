@@ -1,5 +1,5 @@
+// @ts-ignore
 import Wext from '../node/index.mjs';
-import path from 'path';
 
 const template = `
   <!DOCTYPE html>
