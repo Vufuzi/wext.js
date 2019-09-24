@@ -65,9 +65,11 @@ class WextRouter extends HTMLElement {
     });
 
     window.addEventListener('popstate', event => {
-      const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
+      if (event.currentTarget instanceof Window) {
+        const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
 
-      this.navigate(pathname);
+        this.navigate(pathname);
+      }
     });
 
     /*
