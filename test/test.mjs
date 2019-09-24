@@ -9,13 +9,10 @@ const template = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <div id="router">{{body}}</div>
-    <script type="module">
-    import WextRouter from './wext-client.js';
-
-    const routerElement = document.querySelector('#router');
-    const router = new WextRouter(routerElement);
-    </script>
+  <b>derp</b>
+    <wext-router></wext-router>
+    <b>hepr</b>
+    <script type="module" src="wext-client.js"></script>
   </body>
   </html>
 `;

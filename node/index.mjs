@@ -31,40 +31,36 @@ const minifyHTML = s => htmlMinifier.minify(s, {
 
 /**
  * Function to decide wether or not we include the part
- * of the template before the {{body}} tag or not.
+ * of the template before the <wext-router> tag or not.
  *
  * If answerWithPartialContent if true, then anything
- * before {{body}} will not be sent in the request.
+ * before <wext-router> will not be sent in the request.
  *
  * @param {string} template - The template to use.
  * @param {boolean} answerWithPartialContent - Wether or not to send partial content.
  * @returns {string|null} - Pre content.
  */
 function generatePreContent (template, answerWithPartialContent) {
-  if (!answerWithPartialContent) {
-    return template.split('{{body}}')[0];
-  }
-
-  return null;
+  return answerWithPartialContent ?
+    null :
+    template.split('<wext-router>')[0];
 }
 
 /**
  * Function to decide wether or not we include the part
- * of the template after the {{body}} tag or not.
+ * of the template after the <wext-router> tag or not.
  *
  * If answerWithPartialContent if true, then anything
- * after {{body}} will not be sent in the request.
+ * after </wext-router> will not be sent in the request.
  *
- * @param {string} template - The template to use, must contain {{body}}.
+ * @param {string} template - The template to use, must contain <wext-router>.
  * @param {boolean} answerWithPartialContent - Wether or not to send partial content.
  * @returns {string|null} - Pre content.
  */
 function generatePostContent (template, answerWithPartialContent) {
-  if (!answerWithPartialContent) {
-    return template.split('{{body}}')[1];
-  }
-
-  return null;
+  return answerWithPartialContent ?
+    null :
+    template.split('</wext-router>')[1];
 }
 
 /**
@@ -122,7 +118,7 @@ function wext (options) {
 
     const mainBody = config.server.minifyHTML ? minifyHTML(body) : body;
 
-    res.write(mainBody);
+    res.write(partialContent ? mainBody : `<wext-router>${mainBody}</wext-router>`);
 
     const postContent = generatePostContent(page.template, partialContent);
 
@@ -224,7 +220,7 @@ export default class Wext {
       polkaInstace.use(serveStatic(this.config.server.serveStatic));
     }
 
-    polkaInstace.use('/wext-client.js', (req, res) => {
+    polkaInstace.use('/wext-client.js', (_, res) => {
       res.setHeader('Content-type', 'application/javascript');
       res.end(wextClient);
     });

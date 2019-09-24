@@ -6,39 +6,19 @@ function base64DecodeUnicode (str) {
   }).join(''));
 }
 
-export default class WextRouter {
-  constructor (routerElement) {
-    if (routerElement instanceof HTMLElement) {
-      this.routerElement = routerElement;
-    }
+class WextRouter extends HTMLElement {
+  constructor () {
+    super();
 
-    document.addEventListener('wext-router:navigate', event => {
-      if (event instanceof CustomEvent) {
-        const { pathname } = event.detail;
-
-        this.navigate(pathname);
-      }
-    });
-
-    window.addEventListener('popstate', event => {
-      const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
-
-      this.navigate(pathname);
-    });
-
-    /*
-      Wext client was cached by service worker, trigger a fetch of the
-      current page from server to replace the {{body}} injection point.
-    */
-    if (this.routerElement.innerHTML === '{{body}}') {
-      this.navigate(document.location.pathname);
-    }
+    this.loading = true;
   }
 
   async navigate (pathname) {
     document.dispatchEvent(new CustomEvent('wext-router:loading', {
       detail: true
     }));
+
+    this.loading = true;
 
     pathname = pathname.substr(0, 1) === '/' ? pathname : `/${pathname}`;
     const headers = new Headers();
@@ -59,14 +39,14 @@ export default class WextRouter {
     }
 
     requestAnimationFrame(() => {
-      this.routerElement.innerHTML = text;
+      this.innerHTML = text;
 
       document.dispatchEvent(new CustomEvent('wext-router:loading', {
         detail: false
       }));
 
       requestAnimationFrame(() => {
-        this.routerElement.scrollTop = 0;
+        this.scrollTop = 0;
       });
     });
 
@@ -74,7 +54,33 @@ export default class WextRouter {
       window.history.pushState(null, pathname, pathname);
     }
   }
+
+  connectedCallback () {
+    document.addEventListener('wext-router:navigate', event => {
+      if (event instanceof CustomEvent) {
+        const { pathname } = event.detail;
+
+        this.navigate(pathname);
+      }
+    });
+
+    window.addEventListener('popstate', event => {
+      const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
+
+      this.navigate(pathname);
+    });
+
+    /*
+      Wext client was cached by service worker, trigger a fetch of the
+      current page from server to replace the {{body}} injection point.
+    */
+    if (this.innerHTML === '') {
+      this.navigate(document.location.pathname);
+    }
+  }
 }
+
+window.customElements.define('wext-router', WextRouter);
 
 class WextLink extends HTMLElement {
   navigate (pathname) {
