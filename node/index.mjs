@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import http from 'http';
-import polka from 'polka';
+import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import serveStatic from 'serve-static';
@@ -91,6 +91,7 @@ function wext (options) {
     const { body, head } = await page.handler(req, res);
 
     res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Content-Type', 'text/html');
 
     /*
       If we don't send preConent we still want to update the title in the header on client side navigations.
@@ -107,15 +108,18 @@ function wext (options) {
     res.writeHead(200);
 
     if (preContent) {
-      const preSplit = preContent.split(/<head>/);
-      const pre = head ? `
-        ${preSplit[0]}
-        <head>
-        ${config.server.minifyHTML ? minifyHTML(head) : head}
-        ${preSplit[1]}
-      ` : preContent;
+      if (head) {
+        const preSplit = preContent.split(/<head>/);
 
-      res.write(pre);
+        res.write(preSplit[0]);
+
+        const headMarkup = '<head>' + (config.server.minifyHTML ? minifyHTML(head) : head);
+
+        res.write(headMarkup);
+        res.write(preSplit[1]);
+      } else {
+        res.write(preContent);
+      }
     }
 
     const mainBody = config.server.minifyHTML ? minifyHTML(body) : body;
@@ -212,31 +216,31 @@ export default class Wext {
       console.log('Config:', JSON.stringify(this.config));
     }
 
-    const polkaInstace = polka();
+    const app = express();
 
     if (this.config.server.compression) {
-      polkaInstace.use(compression());
+      app.use(compression());
     }
 
     if (this.config.server.serveStatic) {
-      polkaInstace.use(serveStatic(this.config.server.serveStatic));
+      app.use(serveStatic(this.config.server.serveStatic));
     }
 
-    polkaInstace.use('/wext-client.js', (_, res) => {
-      res.setHeader('Content-type', 'application/javascript');
+    app.use('/wext-client.js', (_, res) => {
+      res.setHeader('Content-Type', 'application/javascript');
       res.end(wextClient);
     });
 
     if (this.config.router.pages.length > 0) {
       this.config.router.pages.forEach(page => {
-        polkaInstace.get(page.route, wext({
+        app.get(page.route, wext({
           config: this.config,
           page
         }));
       });
     }
 
-    polkaInstace.listen(port);
+    app.listen(port);
 
     // eslint-disable-next-line no-console
     console.log(`Wext server running at http://localhost:${port}`);
