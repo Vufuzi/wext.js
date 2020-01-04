@@ -12,6 +12,8 @@ function stringToElements (string) {
   return [...fragment.children];
 }
 
+const urlWithoutSearch = url => url.indexOf('?') !== -1 ? url.split('?')[0] : url;
+
 class WextRouter extends HTMLElement {
   constructor () {
     super();
@@ -32,7 +34,7 @@ class WextRouter extends HTMLElement {
     headers.append('X-Partial-Content', 'true');
 
     const search = pathname.indexOf('?') !== -1 ? pathname.split('?')[1] : null;
-    const pathNameWithSearch = pathname + '?partialContent=true' + (search ? '&' + search : '');
+    const pathNameWithSearch = urlWithoutSearch(pathname) + '?partialContent=true' + (search ? '&' + search : '');
 
     const response = await fetch(document.location.origin + pathNameWithSearch, { headers });
     const text = await response.text();
@@ -122,7 +124,7 @@ class WextLink extends HTMLElement {
 
   preloadLink () {
     const search = this.getAttribute('href').indexOf('?') !== -1 ? this.getAttribute('href').split('?')[1] : null;
-    const linkToPreload = this.getAttribute('href') + '?partialContent=true' + (search ? '&' + search : '');
+    const linkToPreload = urlWithoutSearch(this.getAttribute('href')) + '?partialContent=true' + (search ? '&' + search : '');
 
     const currentLinkElement = document.querySelector(`link[href="${linkToPreload}"]`);
 
