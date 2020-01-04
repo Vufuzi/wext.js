@@ -31,7 +31,10 @@ class WextRouter extends HTMLElement {
 
     headers.append('X-Partial-Content', 'true');
 
-    const response = await fetch(document.location.origin + pathname + '?partialContent=true', { headers });
+    const search = pathname.indexOf('?') !== -1 ? pathname.split('?')[1] : null;
+    const pathNameWithSearch = pathname + '?partialContent=true' + (search ? '&' + search : '');
+
+    const response = await fetch(document.location.origin + pathNameWithSearch, { headers });
     const text = await response.text();
     const template = stringToElements(`<template>${text}</template>`)[0];
 
@@ -118,7 +121,9 @@ class WextLink extends HTMLElement {
   }
 
   preloadLink () {
-    const linkToPreload = this.getAttribute('href') + '?partialContent=true';
+    const search = this.getAttribute('href').indexOf('?') !== -1 ? this.getAttribute('href').split('?')[1] : null;
+    const linkToPreload = this.getAttribute('href') + '?partialContent=true' + (search ? '&' + search : '');
+
     const currentLinkElement = document.querySelector(`link[href="${linkToPreload}"]`);
 
     if (!currentLinkElement) {
