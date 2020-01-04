@@ -6,6 +6,12 @@ function base64DecodeUnicode (str) {
   }).join(''));
 }
 
+function stringToElements (string) {
+  const fragment = document.createRange().createContextualFragment(string);
+
+  return [...fragment.children];
+}
+
 class WextRouter extends HTMLElement {
   constructor () {
     super();
@@ -27,6 +33,7 @@ class WextRouter extends HTMLElement {
 
     const response = await fetch(document.location.origin + pathname + '?partialContent=true', { headers });
     const text = await response.text();
+    const template = stringToElements(`<template>${text}</template>`)[0];
 
     const headerUpdates = response.headers.get('X-Header-Updates');
 
@@ -39,7 +46,12 @@ class WextRouter extends HTMLElement {
     }
 
     requestAnimationFrame(() => {
-      this.innerHTML = text;
+      if (template instanceof HTMLTemplateElement) {
+        const newContent = document.importNode(template.content, true);
+
+        this.innerHTML = null;
+        this.appendChild(newContent);
+      }
 
       document.dispatchEvent(new CustomEvent('wext-router:loading', {
         detail: false
@@ -51,7 +63,7 @@ class WextRouter extends HTMLElement {
     });
 
     if (document.location.pathname !== pathname) {
-      window.history.pushState(null, pathname, pathname);
+      window.history.pushState({ scrollTop: this.scrollTop }, pathname, pathname);
     }
   }
 
@@ -67,6 +79,12 @@ class WextRouter extends HTMLElement {
     window.addEventListener('popstate', event => {
       if (event.currentTarget instanceof Window) {
         const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
+
+        // if (history.state && 'scrollTop' in history.state) {
+        //   requestAnimationFrame(() => {
+        //     this.scrollTop = history.state.scrollTop;
+        //   });
+        // }
 
         this.navigate(pathname);
       }

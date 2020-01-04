@@ -48,9 +48,48 @@ const wextConfig = {
         template,
         handler: async () => ({
           body: `
+            <script src="web-comp.js" type="module"></script>
             <h1>Wext.js</h1>
             <h2>About</h2>
 
+            <hello-world></hello-world>
+
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
+            <p>About me, heh? I'm rather cool I guess...</p>
             <p>About me, heh? I'm rather cool I guess...</p>
           `,
           head: '<title>Hej - Åäö</title>'
