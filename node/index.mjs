@@ -87,7 +87,14 @@ function wext (options) {
   async function wextProxy (req, res) {
     // @ts-ignore
     const partialContent = Boolean(req.headers['x-partial-content'] || req.query.partialContent);
-    const { body, head } = await page.handler(req, res);
+    const pageData = await page.handler(req, res);
+
+    if (!pageData) {
+      return;
+    }
+
+    const { body, head } = pageData;
+
     const preContent = generatePreContent(page.template, partialContent);
 
     res.setHeader('Cache-Control', 'public, max-age=3600');
