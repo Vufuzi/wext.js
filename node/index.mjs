@@ -43,7 +43,7 @@ const minifyHTML = s => htmlMinifier.minify(s, {
 function generatePreContent (template, answerWithPartialContent) {
   return answerWithPartialContent ?
     null :
-    template.split('<wext-router>')[0];
+    template.indexOf('<wext-router>') !== -1 ? template.split('<wext-router>')[0] : template;
 }
 
 /**
@@ -60,7 +60,7 @@ function generatePreContent (template, answerWithPartialContent) {
 function generatePostContent (template, answerWithPartialContent) {
   return answerWithPartialContent ?
     null :
-    template.split('</wext-router>')[1];
+    template.indexOf('</wext-router>') !== -1 ? template.split('</wext-router>')[1] : template;
 }
 
 /**
@@ -87,8 +87,8 @@ function wext (options) {
   async function wextProxy (req, res) {
     // @ts-ignore
     const partialContent = Boolean(req.headers['x-partial-content'] || req.query.partialContent);
-    const preContent = generatePreContent(page.template, partialContent);
     const { body, head } = await page.handler(req, res);
+    const preContent = generatePreContent(page.template, partialContent);
 
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.setHeader('Content-Type', 'text/html');
