@@ -14,6 +14,8 @@ function stringToElements (string) {
 
 const urlWithoutSearch = url => url.indexOf('?') !== -1 ? url.split('?')[0] : url;
 
+const documentLocationToPathnameWithSearch = docloc => docloc.href.split(docloc.host).pop();
+
 class WextRouter extends HTMLElement {
   constructor () {
     super();
@@ -67,7 +69,7 @@ class WextRouter extends HTMLElement {
       });
     });
 
-    if (document.location.pathname !== pathname) {
+    if (documentLocationToPathnameWithSearch(document.location) !== pathname) {
       window.history.pushState({ scrollTop: this.scrollTop }, pathname, pathname);
     }
   }
@@ -83,7 +85,7 @@ class WextRouter extends HTMLElement {
 
     window.addEventListener('popstate', event => {
       if (event.currentTarget instanceof Window) {
-        const pathname = decodeURIComponent(event.currentTarget.document.location.pathname);
+        const pathname = decodeURIComponent(documentLocationToPathnameWithSearch(event.currentTarget.document.location));
 
         // if (history.state && 'scrollTop' in history.state) {
         //   requestAnimationFrame(() => {
@@ -100,7 +102,7 @@ class WextRouter extends HTMLElement {
       current page from server to replace the {{body}} injection point.
     */
     if (this.innerHTML === '') {
-      this.navigate(document.location.pathname);
+      this.navigate(documentLocationToPathnameWithSearch(document.location));
     }
   }
 }
