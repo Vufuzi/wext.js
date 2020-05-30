@@ -2,10 +2,11 @@
   "name": "wext",
   "version": "0.3.2",
   "description": "Universal web applications",
-  "main": "node/index.mjs",
+  "type": "module",
+  "main": "node/index.js",
   "module": "browser/wext-client.js",
   "scripts": {
-    "dev": "DEBUG=true node --experimental-modules test/test.mjs"
+    "dev": "DEBUG=true node --experimental-modules test/test.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   },
   "homepage": "https://github.com/Vufuzi/wext.js#readme",
   "dependencies": {
+    "base-64": "^0.1.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "html-entities": "^1.3.1",

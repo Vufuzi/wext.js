@@ -6,6 +6,8 @@ import path from 'path';
 import serveStatic from 'serve-static';
 import compression from 'compression';
 import htmlMinifier from 'html-minifier';
+import base64 from 'base-64';
+
 // import htmlEntities from 'html-entities';
 
 // @ts-ignore
@@ -107,7 +109,7 @@ function wext (options) {
     if (!preContent && head) {
       const title = head.match(/<title>(.+)<\/title>/i)[1];
       const json = JSON.stringify({ title });
-      const base64JSON = Buffer.from(json, 'utf-8').toString('base64');
+      const base64JSON = base64.encode(json);
 
       res.setHeader('X-Header-Updates', base64JSON);
     }
