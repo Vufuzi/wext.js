@@ -181,7 +181,7 @@ async function serveStatic (req: ServerRequest, filePath: string) {
 
   headers.set('content-length', fileInfo.size.toString());
 
-  const contentType = getContentType(extname(filePath));
+  const contentType = getContentType(filePath);
 
   if (contentType) {
     headers.set('content-type', contentType);

@@ -38,7 +38,9 @@ const wextConfig = {
             <p>
               Click link to go further!
               Read <wext-link href="/about">about me.</wext-link>
-            </p>`,
+            </p>
+            <script src="img/app.js"></script>
+            `,
           head: '<title>Welcome</title>'
         })
       },
