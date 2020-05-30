@@ -6,6 +6,7 @@ import { extname } from "https://deno.land/std@0.53.0/path/mod.ts";
 interface PageData {
   head: string;
   body: string;
+  headers: HeadersInit;
 };
 
 interface PageHandlerCallback {
@@ -113,15 +114,18 @@ async function wextProxy (req: ServerRequest, page: Page, config: WextConfig) {
     throw new Error('Could not create PageData from handler.');
   }
 
-  const { body, head } = pageData;
+  const { body, head, headers: pageDataHeaders } = pageData;
 
   // body.replace('<wext-router></wext-router>', `<wext-router>${pageData.body}</wext-router>`)
 
   const preContent = generatePreContent(page.template, partialContent);
 
-  const headers = new Headers();
+  const headers = new Headers(pageDataHeaders);
 
-  headers.set('Cache-Control', 'public, max-age=3600');
+  if (headers.get('Cache-Control') === null) {
+    headers.set('Cache-Control', 'public, max-age=3600');
+  }
+
   headers.set('Content-Type', 'text/html');
 
   /*
