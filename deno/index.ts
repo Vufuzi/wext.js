@@ -202,28 +202,38 @@ export default class Wext {
     Object.freeze(this.config);
   }
 
+  async handleRequest (req: ServerRequest) {
+    const url = reqToURL(req);
+    const page = this.config.router.pages.find(page => page.route === url.pathname);
+
+    const staticPath = url.pathname.match(this.config.server.serveStatic ?? '');
+
+    if (staticPath) {
+      await serveStatic(req, url.pathname);
+    } else if (url.pathname === '/wext-client.js') {
+      const body = await readFileStr('../browser/wext-client.js');
+
+      req.respond({
+        body,
+        headers: new Headers({
+          'Content-Type': 'application/javascript'
+        })
+      });
+    } else if (page) {
+      await wextProxy(req, page, this.config);
+    } else if (this.config.server.serveStatic) {
+      await serveStatic(req, './' + this.config.server.serveStatic + url.pathname);
+    } else {
+      throw new Error('Could not handle path.');
+    }
+  }
+
   async handleRequests (server: Server) {
     for await (const req of server) {
-      const url = reqToURL(req);
-      const page = this.config.router.pages.find(page => page.route === url.pathname);
-
-      const staticPath = url.pathname.match(this.config.server.serveStatic ?? '');
-
-      if (staticPath) {
-        await serveStatic(req, url.pathname);
-      } else if (url.pathname === '/wext-client.js') {
-        const body = await readFileStr('../browser/wext-client.js');
-
-        req.respond({
-          body,
-          headers: new Headers({
-            'Content-Type': 'application/javascript'
-          })
-        });
-      } else if (page) {
-        await wextProxy(req, page, this.config);
-      } else {
-        req.respond({ body: 'Not Found' });
+      try {
+        await this.handleRequest(req);
+      } catch (e) {
+        req.respond({ status: 404, body: 'Not Found' });
       }
     }
   }
