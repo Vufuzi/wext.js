@@ -6,7 +6,7 @@
   "main": "node/index.js",
   "module": "browser/wext-client.js",
   "scripts": {
-    "dev": "DEBUG=true node --experimental-modules test/test.js"
+    "dev": "node test/test.js"
   },
   "repository": {
     "type": "git",

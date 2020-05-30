@@ -1,5 +1,5 @@
 // @ts-ignore
-import Wext from '../node/index.mjs';
+import Wext from '../node/index.js';
 
 const template = `
   <!DOCTYPE html>
