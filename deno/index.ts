@@ -19,12 +19,6 @@ interface Page {
   handler: PageHandlerCallback;
 }
 
-interface Page {
-  route: string;
-  template: string;
-  handler: PageHandlerCallback;
-}
-
 interface RouterConfig {
   pages: Page[];
 }
@@ -187,7 +181,9 @@ async function serveStatic (req: ServerRequest, filePath: string) {
     headers.set('content-type', contentType);
   }
 
-  req.respond({ headers, body: file, status: 200 })
+  await req.respond({ headers, body: file, status: 200 })
+
+  file.close();
 }
 
 export default class Wext {
