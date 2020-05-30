@@ -1,4 +1,4 @@
-const { stat, open } = Deno;
+const { stat, open, close } = Deno;
 import { readFileStr } from 'https://deno.land/std@0.53.0/fs/read_file_str.ts';
 import { serve, ServerRequest, Response, Server } from 'https://deno.land/std@0.53.0/http/server.ts';
 import { extname } from "https://deno.land/std@0.53.0/path/mod.ts";
@@ -183,7 +183,7 @@ async function serveStatic (req: ServerRequest, filePath: string) {
 
   await req.respond({ headers, body: file, status: 200 })
 
-  file.close();
+  close(file.rid);
 }
 
 export default class Wext {
