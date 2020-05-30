@@ -31,7 +31,7 @@ const wextConfig = {
             <h2>Home</h2>
 
             <figure>
-              <img src="public/blomster.webp" alt="Pinl tulips from the Botanical Garden in Oslo">
+              <img src="img/blomster.webp" alt="Pinl tulips from the Botanical Garden in Oslo">
               <figcaption>A picture of flowers from the Botanical Garden in Oslo</figcaption>
             </figure>
 

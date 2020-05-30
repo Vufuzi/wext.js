@@ -6,7 +6,7 @@ import { extname } from "https://deno.land/std@0.53.0/path/mod.ts";
 interface PageData {
   head: string;
   body: string;
-  headers: HeadersInit;
+  headers?: HeadersInit;
 };
 
 interface PageHandlerCallback {
@@ -222,7 +222,7 @@ export default class Wext {
     } else if (page) {
       await wextProxy(req, page, this.config);
     } else if (this.config.server.serveStatic) {
-      await serveStatic(req, './' + this.config.server.serveStatic + url.pathname);
+      await serveStatic(req, '/' + this.config.server.serveStatic + url.pathname);
     } else {
       throw new Error('Could not handle path.');
     }
