@@ -10,7 +10,7 @@ interface PageData {
 };
 
 interface PageHandlerCallback {
-  (req: ServerRequest): Promise<PageData>;
+  (req: ServerRequest, params: Record<string, string>): Promise<PageData>;
 }
 
 interface Page {
@@ -99,9 +99,46 @@ function reqToURL (req: ServerRequest) {
   return new URL(req.url, 'http://' + base);
 }
 
+function canHandleRoute (reqUrl: string, route: string) {
+  const requestURL = reqUrl.split('/');
+  const routeURL = route.split('/');
+
+  const matches = routeURL
+    .map((value, index) => {
+      if (value.includes(':')) {
+        return true;
+      }
+
+      return value === requestURL[index];
+    })
+    .filter(Boolean);
+
+  console.log(requestURL, routeURL, matches);
+
+  return matches.length === routeURL.length && matches.length === requestURL.length;
+}
+
+function routeParams (reqUrl: string, route: string) {
+  const requestURL = reqUrl.split('/');
+  const routeURL = route.split('/');
+
+  return routeURL.reduce((acc, curr, i) => {
+    const keyname = curr.includes(':') ? curr.split(':')[1] : undefined;
+
+    if (keyname) {
+      return {
+        ...acc,
+        [keyname]: requestURL[i],
+      };
+    }
+
+    return acc;
+  }, {});
+}
+
 async function wextProxy (req: ServerRequest, page: Page, config: WextConfig) {
   const partialContent = Boolean(req.headers.get('x-partial-content') || reqToURL(req).searchParams.get('partialContent'));
-  const pageData = await page.handler(req);
+  const pageData = await page.handler(req, routeParams(req.url, page.route));
   const responseBody = [];
 
   if (!pageData) {
@@ -200,7 +237,7 @@ export default class Wext {
 
   async handleRequest (req: ServerRequest) {
     const url = reqToURL(req);
-    const page = this.config.router.pages.find(page => page.route === url.pathname);
+    const page = this.config.router.pages.find(page => canHandleRoute(req.url, page.route));
 
     const staticPath = url.pathname.match(this.config.server.serveStatic ?? '');
 
@@ -235,7 +272,7 @@ export default class Wext {
   }
 
   async startServer (port = 5000) {
-    console.log('Using config: ', JSON.stringify(this.config));
+    // console.log('Using config: ', JSON.stringify(this.config));
 
     const server = serve({ port });
 
