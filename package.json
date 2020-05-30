@@ -5,6 +5,7 @@
   "type": "module",
   "main": "node/index.js",
   "module": "browser/wext-client.js",
+  "deno": "deno/index.ts",
   "scripts": {
     "dev": "node test/test.js"
   },
