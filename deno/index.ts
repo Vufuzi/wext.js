@@ -99,7 +99,8 @@ function reqToURL (req: ServerRequest) {
   return new URL(req.url, 'http://' + base);
 }
 
-function canHandleRoute (reqUrl: string, route: string) {
+function canHandleRoute (req: ServerRequest, route: string) {
+  const reqUrl = reqToURL(req).pathname;
   const requestURL = reqUrl.split('/');
   const routeURL = route.split('/');
 
@@ -113,13 +114,11 @@ function canHandleRoute (reqUrl: string, route: string) {
     })
     .filter(Boolean);
 
-  console.log(requestURL, routeURL, matches);
-
   return matches.length === routeURL.length && matches.length === requestURL.length;
 }
 
-function routeParams (reqUrl: string, route: string) {
-  const requestURL = reqUrl.split('/');
+function routeParams (req: ServerRequest, route: string) {
+  const requestURL = reqToURL(req).pathname.split('/');
   const routeURL = route.split('/');
 
   return routeURL.reduce((acc, curr, i) => {
@@ -138,7 +137,7 @@ function routeParams (reqUrl: string, route: string) {
 
 async function wextProxy (req: ServerRequest, page: Page, config: WextConfig) {
   const partialContent = Boolean(req.headers.get('x-partial-content') || reqToURL(req).searchParams.get('partialContent'));
-  const pageData = await page.handler(req, routeParams(req.url, page.route));
+  const pageData = await page.handler(req, routeParams(req, page.route));
   const responseBody = [];
 
   if (!pageData) {
@@ -169,7 +168,7 @@ async function wextProxy (req: ServerRequest, page: Page, config: WextConfig) {
     if (match) {
       const title = match ? match[1] : '';
       const json = JSON.stringify({ title });
-      const base64JSON = btoa(json);
+      const base64JSON = btoa(unescape(encodeURIComponent(json)));
 
       headers.set('X-Header-Updates', base64JSON);
     }
@@ -207,6 +206,7 @@ async function wextProxy (req: ServerRequest, page: Page, config: WextConfig) {
 
 async function serveStatic (req: ServerRequest, filePath: string) {
   filePath = '.' + filePath;
+
   const [file, fileInfo] = await Promise.all([open(filePath), stat(filePath)]);
   const headers = new Headers();
 
@@ -237,27 +237,42 @@ export default class Wext {
 
   async handleRequest (req: ServerRequest) {
     const url = reqToURL(req);
-    const page = this.config.router.pages.find(page => canHandleRoute(req.url, page.route));
-
     const staticPath = url.pathname.match(this.config.server.serveStatic ?? '');
 
-    if (staticPath) {
-      await serveStatic(req, url.pathname);
-    } else if (url.pathname === '/wext-client.js') {
-      const body = await readFileStr('../browser/wext-client.js');
+    const hasExtention = extname(url.pathname) !== "";
 
-      req.respond({
-        body,
-        headers: new Headers({
-          'Content-Type': 'application/javascript'
-        })
-      });
-    } else if (page) {
+    if (hasExtention) {
+      if (url.pathname === '/wext-client.js') {
+        const body = await readFileStr('../browser/wext-client.js');
+
+        await req.respond({
+          body,
+          headers: new Headers({
+            'Content-Type': 'application/javascript'
+          })
+        });
+        return;
+      }
+
+      if (staticPath) {
+        await serveStatic(req, url.pathname);
+        return;
+      }
+
+      if (this.config.server.serveStatic) {
+        await serveStatic(req, '/' + this.config.server.serveStatic + url.pathname);
+        return;
+      }
+
+      throw new Error('Could not find file.');
+    }
+
+    const page = this.config.router.pages.find(page => canHandleRoute(req, page.route));
+
+    if (page) {
       await wextProxy(req, page, this.config);
-    } else if (this.config.server.serveStatic) {
-      await serveStatic(req, '/' + this.config.server.serveStatic + url.pathname);
     } else {
-      throw new Error('Could not handle path.');
+      throw new Error('Could not find route.');
     }
   }
 
@@ -266,6 +281,8 @@ export default class Wext {
       try {
         await this.handleRequest(req);
       } catch (e) {
+        console.log(req);
+        console.log(e);
         req.respond({ status: 404, body: 'Not Found' });
       }
     }
